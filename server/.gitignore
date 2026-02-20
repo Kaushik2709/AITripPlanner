@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+dist/
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# Database
+dump/
+data/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+test-output.txt
+
+# Uploads
+uploads/
+
+# Build outputs
+build/
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Test files
+test-db.js
+test-gemini.js
+
+# IDE Files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

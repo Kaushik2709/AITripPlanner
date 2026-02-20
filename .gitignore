@@ -1,0 +1,18 @@
+# Backend
+server/node_modules/
+server/.env
+server/uploads/
+server/test-db.js
+server/test-gemini.js
+server/test-output.txt
+
+# Frontend
+client/node_modules/
+client/dist/
+client/.env
+client/.env.local
+
+# General
+.DS_Store
+Thumbs.db
+*.log
