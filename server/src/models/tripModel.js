@@ -4,7 +4,6 @@ const tripSchema = mongoose.Schema(
     {
         user: {
             type: mongoose.Schema.Types.ObjectId,
-            required: true,
             ref: 'User',
         },
         destination: {
@@ -12,7 +11,7 @@ const tripSchema = mongoose.Schema(
             required: true,
         },
         duration: {
-            type: Number,
+            type: String,
             required: true,
         },
         budget: {
@@ -24,7 +23,7 @@ const tripSchema = mongoose.Schema(
             required: true,
         },
         itinerary: {
-            type: Array,
+            type: Object,
             required: true,
         },
         rawAiResponse: {

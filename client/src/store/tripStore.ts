@@ -1,15 +1,29 @@
-import { useState, useCallback } from 'react';
+import { create } from 'zustand';
 import { TripChat, TripMessage, TripFormData, UserProfile } from '@/types/trip';
 
-// Simple state hook for trip chats
-export function useTripStore() {
-  const [chats, setChats] = useState<TripChat[]>([]);
-  const [activeChatId, setActiveChatId] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+interface TripStore {
+  chats: TripChat[];
+  activeChatId: string | null;
+  isLoading: boolean;
+  setChats: (chats: TripChat[]) => void;
+  setActiveChatId: (id: string | null) => void;
+  setIsLoading: (loading: boolean) => void;
+  createChat: (formData: TripFormData) => string;
+  addMessage: (chatId: string, message: Omit<TripMessage, 'id' | 'timestamp'>) => void;
+  updateChat: (oldId: string, newChat: TripChat) => void;
+  deleteChat: (chatId: string) => void;
+}
 
-  const activeChat = chats.find(c => c.id === activeChatId) || null;
+export const useTripStore = create<TripStore>((set, get) => ({
+  chats: [],
+  activeChatId: null,
+  isLoading: false,
 
-  const createChat = useCallback((formData: TripFormData): string => {
+  setChats: (chats) => set({ chats }),
+  setActiveChatId: (id) => set({ activeChatId: id }),
+  setIsLoading: (loading) => set({ isLoading: loading }),
+
+  createChat: (formData) => {
     const id = crypto.randomUUID();
     const userMessage: TripMessage = {
       id: crypto.randomUUID(),
@@ -24,53 +38,56 @@ export function useTripStore() {
       createdAt: new Date(),
       messages: [userMessage],
     };
-    setChats(prev => [newChat, ...prev]);
-    setActiveChatId(id);
+    set((state) => ({
+      chats: [newChat, ...state.chats],
+      activeChatId: id,
+    }));
     return id;
-  }, []);
+  },
 
-  const addMessage = useCallback((chatId: string, message: Omit<TripMessage, 'id' | 'timestamp'>) => {
+  addMessage: (chatId, message) => {
     const newMsg: TripMessage = {
       ...message,
       id: crypto.randomUUID(),
       timestamp: new Date(),
     };
-    setChats(prev =>
-      prev.map(c =>
+    set((state) => ({
+      chats: state.chats.map((c) =>
         c.id === chatId ? { ...c, messages: [...c.messages, newMsg] } : c
-      )
-    );
-  }, []);
+      ),
+    }));
+  },
 
-  const deleteChat = useCallback((chatId: string) => {
-    setChats(prev => prev.filter(c => c.id !== chatId));
-    if (activeChatId === chatId) setActiveChatId(null);
-  }, [activeChatId]);
+  updateChat: (oldId, newChat) => {
+    set((state) => ({
+      chats: state.chats.map((c) => (c.id === oldId ? newChat : c)),
+      // Atomic update of activeChatId if necessary
+      activeChatId: state.activeChatId === oldId ? newChat.id : state.activeChatId,
+    }));
+  },
 
-  return {
-    chats,
-    activeChat,
-    activeChatId,
-    setActiveChatId,
-    createChat,
-    addMessage,
-    deleteChat,
-    isLoading,
-    setIsLoading,
-  };
+  deleteChat: (chatId) => {
+    set((state) => ({
+      chats: state.chats.filter((c) => c.id !== chatId),
+      activeChatId: state.activeChatId === chatId ? null : state.activeChatId,
+    }));
+  },
+}));
+
+interface ProfileStore {
+  profile: UserProfile;
+  setProfile: (profile: UserProfile) => void;
+  updateLocalProfile: (data: Partial<UserProfile>) => void;
 }
 
-export function useProfileStore() {
-  const [profile, setProfile] = useState<UserProfile>({
+export const useProfileStore = create<ProfileStore>((set) => ({
+  profile: {
     name: '',
     email: '',
     password: '',
     avatarUrl: '',
-  });
-
-  const updateProfile = useCallback((data: Partial<UserProfile>) => {
-    setProfile(prev => ({ ...prev, ...data }));
-  }, []);
-
-  return { profile, updateProfile };
-}
+  },
+  setProfile: (profile) => set({ profile }),
+  updateLocalProfile: (data) =>
+    set((state) => ({ profile: { ...state.profile, ...data } })),
+}));

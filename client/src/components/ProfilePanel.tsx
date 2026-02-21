@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { X, Camera, Save } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, Camera, Save, LogOut } from 'lucide-react';
 import { UserProfile } from '@/types/trip';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -8,18 +8,24 @@ interface ProfilePanelProps {
   onClose: () => void;
   profile: UserProfile;
   onSave: (data: Partial<UserProfile>) => void;
+  onLogout: () => void;
 }
 
-export function ProfilePanel({ isOpen, onClose, profile, onSave }: ProfilePanelProps) {
+export function ProfilePanel({ isOpen, onClose, profile, onSave, onLogout }: ProfilePanelProps) {
   const [form, setForm] = useState(profile);
   const [avatarPreview, setAvatarPreview] = useState(profile.avatarUrl);
+
+  useEffect(() => {
+    setForm(profile);
+    setAvatarPreview(profile.avatarUrl);
+  }, [profile]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const url = URL.createObjectURL(file);
       setAvatarPreview(url);
-      setForm(prev => ({ ...prev, avatarUrl: url }));
+      setForm(prev => ({ ...prev, profileImage: file }));
     }
   };
 
@@ -118,14 +124,21 @@ export function ProfilePanel({ isOpen, onClose, profile, onSave }: ProfilePanelP
               </div>
             </form>
 
-            {/* Save Button */}
-            <div className="p-6 border-t border-border">
+            {/* Actions */}
+            <div className="p-6 border-t border-border flex flex-col gap-3">
               <button
                 onClick={handleSave}
                 className="w-full py-3 rounded-xl gradient-primary text-primary-foreground font-medium text-sm flex items-center justify-center gap-2 shadow-card hover:shadow-elevated transition-shadow"
               >
                 <Save className="w-4 h-4" />
                 Save Changes
+              </button>
+              <button
+                onClick={onLogout}
+                className="w-full py-3 rounded-xl border border-destructive/20 text-destructive hover:bg-destructive/10 font-medium text-sm flex items-center justify-center gap-2 transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                Log Out
               </button>
             </div>
           </motion.div>

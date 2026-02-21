@@ -8,10 +8,9 @@ import bcrypt from 'bcryptjs';
 // @access  Public
 const authUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
-
     const user = await User.findOne({ email });
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (user && isMatch) {
+
+    if (user && (await bcrypt.compare(password, user.password))) {
         res.json({
             _id: user._id,
             name: user.name,
@@ -68,4 +67,47 @@ const generateToken = (id) => {
     });
 };
 
-export { authUser, registerUser };
+const getProfile = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id)
+    if (!user) {
+        res.status(404)
+        throw new Error('User not found')
+    }
+    res.status(200).json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        profileImage: user.profileImage,
+    });
+});
+
+const updateProfile = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+        user.name = req.body.name || user.name;
+        user.email = req.body.email || user.email;
+        if (req.body.password) {
+            const salt = await bcrypt.genSalt(10);
+            user.password = await bcrypt.hash(req.body.password, salt);
+        }
+        if (req.file) {
+            user.profileImage = `/uploads/${req.file.filename}`;
+        }
+
+        const updatedUser = await user.save();
+
+        res.json({
+            _id: updatedUser._id,
+            name: updatedUser.name,
+            email: updatedUser.email,
+            profileImage: updatedUser.profileImage,
+            token: generateToken(updatedUser._id),
+        });
+    } else {
+        res.status(404);
+        throw new Error('User not found');
+    }
+});
+
+export { authUser, registerUser, getProfile, updateProfile };

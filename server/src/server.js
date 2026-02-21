@@ -8,13 +8,25 @@ import tripRoutes from './routes/tripRoutes.js'
 import { notFound, errorHandler } from './middleware/errorMiddleware.js'
 import dns from 'dns'
 import path from 'path'
+import fs from 'fs'
 
 dns.setServers(['8.8.8.8'])
 connectDB()
 
+// Ensure uploads directory exists
+const uploadDir = path.join(path.resolve(), 'uploads')
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir)
+}
+
 const app = express()
 
-app.use(cors())
+app.use(cors({
+    origin: true,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+}))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
@@ -25,7 +37,7 @@ app.get('/', (req, res) => {
     res.send('AI Trip Planner API is running...')
 })
 
-app.use('/api/users', userRoutes)
+app.use('/api/auth', userRoutes)
 app.use('/api/trips', tripRoutes)
 
 app.use(notFound)

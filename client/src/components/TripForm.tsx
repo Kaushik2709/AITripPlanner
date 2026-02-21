@@ -74,7 +74,7 @@ export function TripForm({ onSubmit, isLoading }: TripFormProps) {
             <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Duration (e.g., 5 days, 2 weeks)"
+              placeholder="Duration (e.g., 14 days in days)"
               value={formData.duration}
               onChange={e => setFormData(prev => ({ ...prev, duration: e.target.value }))}
               className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-card border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all shadow-card text-sm"

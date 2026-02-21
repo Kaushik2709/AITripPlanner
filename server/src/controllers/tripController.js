@@ -21,13 +21,14 @@ const createTrip = asyncHandler(async (req, res) => {
         companions
     });
 
+    console.log(aiResponse);
     const trip = new Trip({
         user: req.user._id,
         destination,
         duration,
         budget,
         companions,
-        itinerary: aiResponse.itinerary,
+        itinerary: aiResponse,
         rawAiResponse: aiResponse
     });
 

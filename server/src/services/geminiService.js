@@ -5,7 +5,6 @@ const generateTripItinerary = async (tripDetails) => {
 
   const key = process.env.GEMINI_API_KEY;
   const genAI = new GoogleGenerativeAI(key);
-  console.log('Gemini API Key loaded:', key ? `${key.substring(0, 4)}...${key.substring(key.length - 4)}` : 'MISSING');
   const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
 
   const prompt = `

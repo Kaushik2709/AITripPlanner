@@ -23,6 +23,6 @@ export interface TripFormData {
 export interface UserProfile {
   name: string;
   email: string;
-  password: string;
+  password?: string;
   avatarUrl: string;
 }
