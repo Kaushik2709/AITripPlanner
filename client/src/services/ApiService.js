@@ -1,6 +1,8 @@
 import api from "./ApiURL";
 
-export const ASSETS_URL = "http://localhost:3000";
+export const ASSETS_URL =
+    import.meta.env.VITE_ASSETS_URL ||
+    (import.meta.env.PROD ? window.location.origin : "http://localhost:3000");
 
 export const apiService = {
     // Auth API END POINTS 
